@@ -3,342 +3,433 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>New Tab</title>
+<title>Dashboard</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:        #1a1a1a;
-  --surface:   rgba(255,255,255,0.05);
-  --border:    rgba(255,255,255,0.08);
-  --text:      #f0ede8;
-  --muted:     rgba(240,237,232,0.38);
-  --accent:    #e8845a;
-  --accent-lo: rgba(232,132,90,0.15);
-  --accent-br: rgba(232,132,90,0.35);
-  --blur:      blur(20px);
-  --radius:    12px;
+  --bg:         #181818;
+  --bg-card:    #1e1e1e;
+  --bg-hover:   #242424;
+  --border:     rgba(255,255,255,0.07);
+  --border-act: rgba(255,255,255,0.14);
+  --text:       #eeebe5;
+  --text-2:     rgba(238,235,229,0.55);
+  --text-3:     rgba(238,235,229,0.28);
+  --accent:     #e07d4f;
+  --accent-dim: rgba(224,125,79,0.12);
+  --accent-mid: rgba(224,125,79,0.28);
+  --gaming:     #7b9ef6;
+  --tech:       #4fc3a1;
+  --cinema:     #c97be8;
+  --blur:       blur(20px);
+  --r:          12px;
+  --r-sm:       7px;
+  --font:       'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
-html, body {
-  height: 100%; background: var(--bg); color: var(--text);
-  font-family: 'Segoe UI', system-ui, sans-serif; overflow: hidden;
-}
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font); overflow: hidden; }
 
-body::before {
-  content: ''; position: fixed; inset: 0;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
-  background-size: 52px 52px; pointer-events: none; z-index: 0;
-}
-body::after {
-  content: ''; position: fixed; top: -30%; left: 50%; transform: translateX(-50%);
-  width: 800px; height: 500px;
-  background: radial-gradient(ellipse, rgba(232,132,90,0.04) 0%, transparent 65%);
-  pointer-events: none; z-index: 0;
-}
-
-/* ══════════════════════════════════
+/* ═══════════════════════════════════════
    ТОПБАР
-══════════════════════════════════ */
+═══════════════════════════════════════ */
 .topbar {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 20;
-  display: flex; justify-content: center; align-items: center;
-  padding: 10px 0;
-  animation: fadeDown 0.4s cubic-bezier(0.4,0,0.2,1) both;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+  display: flex; justify-content: center; padding: 10px 0;
+  animation: slideDown 0.5s cubic-bezier(0.4,0,0.2,1) both;
 }
-.topbar-inner {
-  display: flex; align-items: center; gap: 2px;
-  background: rgba(26,26,26,0.75);
-  border: 1px solid var(--border); border-radius: 11px;
-  padding: 5px 6px;
+.topbar-pill {
+  display: flex; align-items: center; gap: 1px;
+  background: rgba(24,24,24,0.92);
+  border: 1px solid var(--border);
+  border-radius: 13px; padding: 4px 6px;
   backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04), 0 4px 24px rgba(0,0,0,0.5);
 }
-.link-group { display: flex; align-items: center; gap: 1px; }
-.group-label {
-  font-size: 8.5px; letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--muted); padding: 0 6px 0 8px; opacity: 0.6; white-space: nowrap;
+.tg { display: flex; align-items: center; }
+.tg-sep { width: 1px; height: 18px; background: var(--border); margin: 0 5px; }
+.tg-lbl {
+  font-size: 8px; font-weight: 700; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--text-3);
+  padding: 0 4px 0 8px; white-space: nowrap;
 }
-.top-link {
-  display: flex; align-items: center; gap: 5px; padding: 4px 9px; border-radius: 7px;
-  text-decoration: none; color: var(--muted); font-size: 11.5px; font-weight: 500;
-  transition: color 0.12s ease, background 0.12s ease; white-space: nowrap;
+.tl {
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 8px;
+  text-decoration: none; color: var(--text-2);
+  font-size: 11.5px; font-weight: 500; letter-spacing: 0.01em;
+  transition: color 0.1s, background 0.1s; white-space: nowrap;
 }
-.top-link:hover { color: var(--text); background: rgba(255,255,255,0.07); }
-.top-link img { width: 13px; height: 13px; border-radius: 3px; opacity: 0.72; flex-shrink: 0; }
-.topbar-sep { width: 1px; height: 16px; background: var(--border); margin: 0 4px; flex-shrink: 0; }
+.tl:hover { color: var(--text); background: rgba(255,255,255,0.07); }
+.tl img { width: 13px; height: 13px; border-radius: 3px; opacity: 0.75; flex-shrink: 0; }
 
-/* ══════════════════════════════════
-   СЕТКА
-══════════════════════════════════ */
-.dashboard {
-  position: relative; z-index: 1; height: 100vh;
+/* ═══════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════ */
+.layout {
+  height: 100vh;
   display: grid;
-  grid-template-columns: 252px 1fr 252px;
-  grid-template-rows: 1fr 1fr;
-  padding: 60px 36px 36px; gap: 0;
+  grid-template-columns: 248px 1fr 296px;
+  grid-template-rows: 100%;
+  padding: 58px 28px 28px;
+  gap: 16px;
 }
 
+/* ═══════════════════════════════════════
+   КАРТОЧКА
+═══════════════════════════════════════ */
 .card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius);
-  backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
-  padding: 15px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px;
 }
-.card-label {
-  font-size: 8.5px; letter-spacing: 0.17em; text-transform: uppercase;
-  color: var(--muted); margin-bottom: 11px; font-weight: 600;
+.clabel {
+  font-size: 8px; font-weight: 800; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--text-3);
+  margin-bottom: 12px; display: block;
 }
 
-/* ══════════════════════════════════
-   ЧАСЫ
-══════════════════════════════════ */
-.clock-block {
-  grid-column: 2; grid-row: 1 / 3;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding-bottom: 48px;
-  animation: fadeUp 0.5s 0.04s cubic-bezier(0.4,0,0.2,1) both;
+/* ═══════════════════════════════════════
+   ЛЕВАЯ КОЛОНКА
+═══════════════════════════════════════ */
+.col-left {
+  display: flex; flex-direction: column; gap: 14px;
+  animation: fadeUp 0.5s 0.05s cubic-bezier(0.4,0,0.2,1) both;
 }
-.clock {
-  font-variant-numeric: tabular-nums;
-  font-size: clamp(68px, 9vw, 116px);
-  font-weight: 700; letter-spacing: -0.04em; line-height: 1;
+
+/* ЧАСЫ */
+.clock-card {
+  text-align: center; padding: 20px 16px;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--r);
 }
-.clock::after {
-  content: ''; display: block; margin: 10px auto 0; width: 32px; height: 1.5px;
+.clock-time {
+  font-size: 58px; font-weight: 800; letter-spacing: -0.05em;
+  line-height: 1; font-variant-numeric: tabular-nums; color: var(--text);
+}
+.clock-colon { color: var(--accent); animation: blink 1s step-end infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.1} }
+.clock-divider {
+  width: 28px; height: 1.5px; margin: 10px auto 9px;
   background: linear-gradient(90deg, transparent, var(--accent), transparent);
 }
-.colon { animation: blink 1s step-end infinite; color: var(--accent); }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.1} }
-.date-str {
-  font-size: 11px; font-weight: 600; letter-spacing: 0.18em;
-  text-transform: uppercase; color: var(--muted); margin-top: 8px;
-}
-.greeting { font-size: 13px; font-weight: 500; color: var(--muted); margin-top: 3px; letter-spacing: 0.04em; }
+.clock-date { font-size: 10px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-3); }
+.clock-greet { font-size: 13px; font-weight: 500; color: var(--text-2); margin-top: 4px; }
+.clock-greet .name { color: var(--accent); font-weight: 800; }
 
-/* ══════════════════════════════════
-   ЛЕВАЯ КОЛОНКА
-══════════════════════════════════ */
-.left-col {
-  grid-column: 1; grid-row: 1 / 3;
-  display: flex; flex-direction: column; justify-content: center; gap: 12px;
-  animation: fadeUp 0.5s 0.06s cubic-bezier(0.4,0,0.2,1) both;
+/* ПОГОДА */
+.weather-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--r); padding: 15px; flex: 1; }
+.w-search { display: flex; gap: 6px; margin-bottom: 12px; }
+.w-inp {
+  flex: 1; padding: 7px 10px; background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border); border-radius: var(--r-sm);
+  color: var(--text); font: 12px/1 var(--font); font-weight: 500; outline: none;
+  transition: border-color 0.13s;
 }
+.w-inp:focus { border-color: var(--accent-mid); }
+.w-inp::placeholder { color: var(--text-3); font-weight: 400; }
+.w-btn {
+  padding: 7px 11px; background: var(--accent-dim);
+  border: 1px solid var(--accent-mid); border-radius: var(--r-sm);
+  color: var(--accent); font: 700 13px var(--font); cursor: pointer;
+  transition: background 0.13s;
+}
+.w-btn:hover { background: rgba(224,125,79,0.22); }
+.w-main { display: flex; align-items: flex-end; gap: 8px; margin-bottom: 3px; }
+.w-temp { font-size: 46px; font-weight: 800; letter-spacing: -0.04em; line-height: 1; font-variant-numeric: tabular-nums; }
+.w-icon { font-size: 28px; line-height: 1; padding-bottom: 3px; }
+.w-desc { font-size: 11.5px; font-weight: 600; color: var(--text-2); margin-bottom: 2px; }
+.w-loc { font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); margin-bottom: 11px; }
+.w-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--border); }
+.w-row:last-child { border: none; }
+.w-rl { font-size: 11px; font-weight: 500; color: var(--text-2); }
+.w-rv { font-size: 11px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+.w-msg { font-size: 12px; font-weight: 500; color: var(--text-3); }
 
-/* Погода */
-.weather-card { width: 222px; }
-.w-city-input-wrap { display: flex; gap: 5px; margin-bottom: 10px; }
-.w-city-input {
-  flex: 1; padding: 6px 9px; background: rgba(255,255,255,0.05);
-  border: 1px solid var(--border); border-radius: 7px;
-  color: var(--text); font-family: inherit; font-size: 12px; font-weight: 500; outline: none;
-  transition: border-color 0.13s ease;
+/* ═══════════════════════════════════════
+   ЦЕНТР — НОВОСТИ
+═══════════════════════════════════════ */
+.col-center {
+  display: flex; flex-direction: column; gap: 0;
+  animation: fadeUp 0.5s 0.08s cubic-bezier(0.4,0,0.2,1) both;
+  min-height: 0;
 }
-.w-city-input:focus { border-color: var(--accent-br); }
-.w-city-input::placeholder { color: var(--muted); font-weight: 400; }
-.w-city-btn {
-  padding: 6px 10px; background: var(--accent-lo); border: 1px solid var(--accent-br);
-  border-radius: 7px; color: var(--accent); font-family: inherit; font-size: 12px;
-  font-weight: 600; cursor: pointer; transition: background 0.13s ease;
+.news-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--r);
+  display: flex; flex-direction: column; height: 100%;
+  overflow: hidden;
 }
-.w-city-btn:hover { background: rgba(232,132,90,0.25); }
-.w-main { display: flex; align-items: flex-end; gap: 8px; margin-bottom: 2px; }
-.w-temp { font-size: 50px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; }
-.w-icon { font-size: 32px; line-height: 1; padding-bottom: 4px; }
-.w-desc { font-size: 12px; font-weight: 500; color: var(--muted); margin-bottom: 3px; }
-.w-city-name { font-size: 9px; font-weight: 600; letter-spacing: 0.13em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; opacity: 0.55; }
-.w-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); }
-.w-row:last-child { border-bottom: none; }
-.w-row-label { font-size: 11px; font-weight: 500; color: var(--muted); }
-.w-row-val { font-size: 12px; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
-.w-msg { font-size: 12px; font-weight: 500; color: var(--muted); line-height: 1.6; }
+.news-header {
+  display: flex; align-items: center; gap: 0;
+  border-bottom: 1px solid var(--border);
+  padding: 0 16px; flex-shrink: 0;
+}
+.news-tab {
+  display: flex; align-items: center; gap: 7px;
+  padding: 13px 14px; font-size: 12px; font-weight: 700;
+  color: var(--text-3); cursor: pointer; border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s; white-space: nowrap;
+  margin-bottom: -1px;
+}
+.news-tab:hover { color: var(--text-2); }
+.news-tab.active { color: var(--text); }
+.news-tab.active[data-cat="gaming"]  { border-color: var(--gaming); color: var(--gaming); }
+.news-tab.active[data-cat="tech"]    { border-color: var(--tech);   color: var(--tech);   }
+.news-tab.active[data-cat="cinema"]  { border-color: var(--cinema); color: var(--cinema); }
+.news-tab-dot {
+  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+}
+.tab-gaming .news-tab-dot { background: var(--gaming); }
+.tab-tech   .news-tab-dot { background: var(--tech);   }
+.tab-cinema .news-tab-dot { background: var(--cinema); }
 
-/* ══════════════════════════════════
-   ПЛЕЕР SPOTIFY
-══════════════════════════════════ */
-.player-card { width: 222px; }
-
-/* Кнопка входа */
-.sp-login-btn {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  width: 100%; padding: 9px 12px;
-  background: rgba(29,185,84,0.1); border: 1px solid rgba(29,185,84,0.25);
-  border-radius: 8px; color: #1db954; font-family: inherit;
-  font-size: 12px; font-weight: 600; cursor: pointer; letter-spacing: 0.03em;
-  transition: background 0.13s ease;
+.news-refresh {
+  margin-left: auto; background: none; border: none;
+  color: var(--text-3); cursor: pointer; padding: 6px;
+  border-radius: 6px; font-size: 14px; transition: color 0.12s, transform 0.3s;
 }
-.sp-login-btn:hover { background: rgba(29,185,84,0.18); }
-.sp-login-btn svg { flex-shrink: 0; }
+.news-refresh:hover { color: var(--text-2); }
+.news-refresh.spinning { animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
-/* Обложка */
-.sp-cover-wrap { position: relative; margin-bottom: 10px; }
-.sp-cover {
-  width: 100%; aspect-ratio: 1; border-radius: 8px; object-fit: cover;
-  background: rgba(255,255,255,0.05);
-  display: block;
+.news-body { flex: 1; overflow-y: auto; padding: 6px 0; }
+.news-body::-webkit-scrollbar { width: 4px; }
+.news-body::-webkit-scrollbar-track { background: transparent; }
+.news-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.news-item {
+  display: flex; gap: 13px; align-items: flex-start;
+  padding: 11px 16px; border-bottom: 1px solid rgba(255,255,255,0.04);
+  text-decoration: none; transition: background 0.12s; cursor: pointer;
 }
-.sp-cover-placeholder {
-  width: 100%; aspect-ratio: 1; border-radius: 8px;
+.news-item:last-child { border-bottom: none; }
+.news-item:hover { background: var(--bg-hover); }
+
+.news-img {
+  width: 72px; height: 48px; border-radius: 6px; object-fit: cover;
+  background: rgba(255,255,255,0.05); flex-shrink: 0;
+  border: 1px solid var(--border);
+}
+.news-img-placeholder {
+  width: 72px; height: 48px; border-radius: 6px; flex-shrink: 0;
   background: rgba(255,255,255,0.04); border: 1px solid var(--border);
   display: flex; align-items: center; justify-content: center;
-}
-.sp-cover-placeholder svg { opacity: 0.18; }
-
-/* Трек */
-.sp-track { margin-bottom: 10px; }
-.sp-title {
-  font-size: 13px; font-weight: 700; color: var(--text);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  letter-spacing: 0.01em;
-}
-.sp-artist { font-size: 11px; font-weight: 500; color: var(--muted); margin-top: 2px; }
-
-/* Прогресс */
-.sp-progress { margin-bottom: 10px; cursor: pointer; padding: 5px 0; }
-.sp-bar { height: 2px; background: rgba(255,255,255,0.08); border-radius: 2px; position: relative; }
-.sp-fill {
-  height: 100%; width: 0%; border-radius: 2px;
-  background: linear-gradient(90deg, var(--accent), #f0a070);
-  transition: width 0.5s linear; position: relative;
-}
-.sp-fill::after {
-  content: ''; position: absolute; right: -4px; top: -3px;
-  width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
-  opacity: 0; transition: opacity 0.13s ease;
-}
-.sp-progress:hover .sp-fill::after { opacity: 1; }
-.sp-time {
-  display: flex; justify-content: space-between;
-  font-size: 9px; font-weight: 600; color: var(--muted);
-  letter-spacing: 0.05em; font-variant-numeric: tabular-nums; margin-top: 4px;
+  font-size: 18px;
 }
 
-/* Контролы */
-.sp-controls { display: flex; align-items: center; justify-content: center; gap: 14px; }
-.sp-btn {
-  background: none; border: none; color: var(--muted); cursor: pointer;
-  padding: 4px; border-radius: 5px; display: flex; align-items: center;
-  transition: color 0.12s ease, transform 0.12s ease;
+.news-content { flex: 1; min-width: 0; }
+.news-source {
+  font-size: 9px; font-weight: 800; letter-spacing: 0.12em;
+  text-transform: uppercase; margin-bottom: 4px;
 }
-.sp-btn:hover { color: var(--text); transform: scale(1.12); }
-.sp-btn.play {
-  width: 34px; height: 34px;
-  background: rgba(255,255,255,0.07); border: 1px solid var(--border);
-  border-radius: 50%; color: var(--text);
-}
-.sp-btn.play:hover { background: rgba(255,255,255,0.12); transform: scale(1.06); }
+.news-source.gaming { color: var(--gaming); }
+.news-source.tech   { color: var(--tech);   }
+.news-source.cinema { color: var(--cinema); }
 
-/* Статус */
-.sp-status {
-  font-size: 10px; font-weight: 500; color: var(--muted);
-  text-align: center; margin-top: 8px; letter-spacing: 0.04em;
-  min-height: 14px;
+.news-title {
+  font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.4;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  margin-bottom: 5px;
 }
-.sp-status.live { color: #1db954; }
+.news-meta { font-size: 10px; font-weight: 500; color: var(--text-3); }
 
-/* ══════════════════════════════════
-   ПРАВАЯ КОЛОНКА — КАЛЕНДАРЬ
-══════════════════════════════════ */
-.right-col {
-  grid-column: 3; grid-row: 1 / 3;
-  display: flex; align-items: center; justify-content: flex-end;
-  animation: fadeUp 0.5s 0.06s cubic-bezier(0.4,0,0.2,1) both;
+.news-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 100%; gap: 8px; color: var(--text-3);
 }
-.cal-card { width: 222px; }
-.cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.cal-month-label { font-size: 13px; font-weight: 700; letter-spacing: 0.02em; }
-.cal-nav { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 2px 5px; border-radius: 5px; transition: color 0.12s ease; }
-.cal-nav:hover { color: var(--text); }
-.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
-.cal-dow { font-size: 9px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); text-align: center; padding: 2px 0 6px; }
-.cal-day { font-size: 12px; font-weight: 500; text-align: center; padding: 5px 2px; border-radius: 5px; color: var(--muted); font-variant-numeric: tabular-nums; transition: background 0.12s ease; }
-.cal-day.in-month { color: var(--text); }
-.cal-day.weekend { color: rgba(232,132,90,0.75); }
-.cal-day.today { background: var(--accent); color: #fff !important; font-weight: 700; }
-.cal-day.in-month:hover:not(.today) { background: rgba(255,255,255,0.06); }
+.news-empty-icon { font-size: 32px; opacity: 0.4; }
+.news-empty-text { font-size: 12px; font-weight: 500; }
 
-@keyframes fadeUp   { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-@keyframes fadeDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+.news-skeleton {
+  padding: 11px 16px; border-bottom: 1px solid rgba(255,255,255,0.04);
+  display: flex; gap: 13px;
+}
+.skel {
+  background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0.05) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite; border-radius: 5px;
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+.skel-img { width: 72px; height: 48px; border-radius: 6px; flex-shrink: 0; }
+.skel-lines { flex: 1; display: flex; flex-direction: column; gap: 7px; padding-top: 2px; }
+.skel-line { height: 10px; }
+
+/* ═══════════════════════════════════════
+   ПРАВАЯ КОЛОНКА
+═══════════════════════════════════════ */
+.col-right {
+  display: flex; flex-direction: column; gap: 14px;
+  animation: fadeUp 0.5s 0.1s cubic-bezier(0.4,0,0.2,1) both;
+  min-height: 0;
+}
+
+/* КАЛЕНДАРЬ */
+.cal-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--r);
+  padding: 15px; flex-shrink: 0;
+}
+.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.cal-month { font-size: 13px; font-weight: 800; letter-spacing: 0.01em; }
+.cal-nav {
+  background: none; border: none; color: var(--text-3); cursor: pointer;
+  font-size: 16px; padding: 3px 6px; border-radius: 6px;
+  transition: color 0.12s, background 0.12s;
+}
+.cal-nav:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+.cal-dow {
+  font-size: 8.5px; font-weight: 800; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text-3); text-align: center; padding: 2px 0 7px;
+}
+.cal-day {
+  font-size: 12px; font-weight: 500; text-align: center; padding: 5px 2px;
+  border-radius: 6px; color: var(--text-3); font-variant-numeric: tabular-nums;
+  position: relative; transition: background 0.1s, color 0.1s;
+}
+.cal-day.in  { color: var(--text); }
+.cal-day.wkn.in { color: rgba(224,125,79,0.75); }
+.cal-day.now { background: var(--accent); color: #fff !important; font-weight: 800; box-shadow: 0 2px 10px rgba(224,125,79,0.4); }
+.cal-day.in:not(.now):hover { background: rgba(255,255,255,0.07); cursor: default; }
+.ev-dot { position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); width: 3px; height: 3px; border-radius: 50%; }
+.cal-day.now .ev-dot { background: rgba(255,255,255,0.7); }
+.cal-day[data-ev]:hover::after {
+  content: attr(data-ev);
+  position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
+  background: #111; border: 1px solid var(--border-act);
+  color: var(--text); font-size: 10px; font-weight: 600;
+  padding: 4px 9px; border-radius: 7px; white-space: nowrap;
+  z-index: 200; pointer-events: none; backdrop-filter: blur(8px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+}
+
+/* СОБЫТИЯ */
+.ev-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--r);
+  padding: 15px; flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column;
+}
+.ev-list { display: flex; flex-direction: column; gap: 7px; overflow-y: auto; flex: 1; }
+.ev-list::-webkit-scrollbar { width: 3px; }
+.ev-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.ev-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: var(--r-sm);
+  background: rgba(255,255,255,0.025); border: 1px solid var(--border);
+  transition: background 0.12s;
+}
+.ev-row:hover { background: rgba(255,255,255,0.05); }
+.ev-color { width: 3px; height: 32px; border-radius: 2px; flex-shrink: 0; }
+.ev-info { flex: 1; min-width: 0; }
+.ev-name { font-size: 12px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ev-date { font-size: 10px; font-weight: 500; color: var(--text-3); margin-top: 1px; }
+.ev-countdown { font-size: 10px; font-weight: 800; white-space: nowrap; }
+.ev-countdown.soon { color: var(--accent); }
+.ev-countdown.far  { color: var(--text-3); }
+
+@keyframes fadeUp   { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+@keyframes slideDown { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
 </style>
 </head>
 <body>
 
 <!-- ТОПБАР -->
 <div class="topbar">
-  <div class="topbar-inner">
-    <div class="link-group">
-      <span class="group-label">Развлечения</span>
-      <a class="top-link" href="https://youtube.com"><img src="https://www.google.com/s2/favicons?domain=youtube.com&sz=32" onerror="this.style.display='none'"> YouTube</a>
-      <a class="top-link" href="https://twitch.tv"><img src="https://www.google.com/s2/favicons?domain=twitch.tv&sz=32" onerror="this.style.display='none'"> Twitch</a>
-      <a class="top-link" href="https://open.spotify.com"><img src="https://www.google.com/s2/favicons?domain=spotify.com&sz=32" onerror="this.style.display='none'"> Spotify</a>
+  <div class="topbar-pill">
+    <div class="tg">
+      <span class="tg-lbl">Развлечения</span>
+      <a class="tl" href="https://youtube.com"><img src="https://www.google.com/s2/favicons?domain=youtube.com&sz=32" onerror="this.style.display='none'"> YouTube</a>
+      <a class="tl" href="https://twitch.tv"><img src="https://www.google.com/s2/favicons?domain=twitch.tv&sz=32" onerror="this.style.display='none'"> Twitch</a>
+      <a class="tl" href="https://open.spotify.com"><img src="https://www.google.com/s2/favicons?domain=spotify.com&sz=32" onerror="this.style.display='none'"> Spotify</a>
+      <a class="tl" href="https://pinterest.com"><img src="https://www.google.com/s2/favicons?domain=pinterest.com&sz=32" onerror="this.style.display='none'"> Pinterest</a>
     </div>
-    <div class="topbar-sep"></div>
-    <div class="link-group">
-      <span class="group-label">Мессенджеры</span>
-      <a class="top-link" href="https://vk.com"><img src="https://www.google.com/s2/favicons?domain=vk.com&sz=32" onerror="this.style.display='none'"> VK</a>
-      <a class="top-link" href="https://web.telegram.org"><img src="https://www.google.com/s2/favicons?domain=telegram.org&sz=32" onerror="this.style.display='none'"> Telegram</a>
-      <a class="top-link" href="https://mail.google.com"><img src="https://www.google.com/s2/favicons?domain=mail.google.com&sz=32" onerror="this.style.display='none'"> Gmail</a>
+    <div class="tg-sep"></div>
+    <div class="tg">
+      <span class="tg-lbl">Мессенджеры</span>
+      <a class="tl" href="https://vk.com"><img src="https://www.google.com/s2/favicons?domain=vk.com&sz=32" onerror="this.style.display='none'"> VK</a>
+      <a class="tl" href="https://web.telegram.org/a/"><img src="https://www.google.com/s2/favicons?domain=telegram.org&sz=32" onerror="this.style.display='none'"> Telegram</a>
+      <a class="tl" href="https://mail.google.com"><img src="https://www.google.com/s2/favicons?domain=mail.google.com&sz=32" onerror="this.style.display='none'"> Gmail</a>
     </div>
-    <div class="topbar-sep"></div>
-    <div class="link-group">
-      <span class="group-label">Работа</span>
-      <a class="top-link" href="https://drive.google.com"><img src="https://www.google.com/s2/favicons?domain=drive.google.com&sz=32" onerror="this.style.display='none'"> Диск</a>
+    <div class="tg-sep"></div>
+    <div class="tg">
+      <span class="tg-lbl">Работа</span>
+      <a class="tl" href="https://drive.google.com"><img src="https://www.google.com/s2/favicons?domain=drive.google.com&sz=32" onerror="this.style.display='none'"> Диск</a>
     </div>
-    <div class="topbar-sep"></div>
-    <div class="link-group">
-      <span class="group-label">Нейросети</span>
-      <a class="top-link" href="https://claude.ai"><img src="https://www.google.com/s2/favicons?domain=claude.ai&sz=32" onerror="this.style.display='none'"> Claude</a>
-      <a class="top-link" href="https://gemini.google.com"><img src="https://www.google.com/s2/favicons?domain=gemini.google.com&sz=32" onerror="this.style.display='none'"> Gemini</a>
-      <a class="top-link" href="https://grok.com"><img src="https://www.google.com/s2/favicons?domain=grok.com&sz=32" onerror="this.style.display='none'"> Grok</a>
+    <div class="tg-sep"></div>
+    <div class="tg">
+      <span class="tg-lbl">Нейросети</span>
+      <a class="tl" href="https://claude.ai"><img src="https://www.google.com/s2/favicons?domain=claude.ai&sz=32" onerror="this.style.display='none'"> Claude</a>
+      <a class="tl" href="https://gemini.google.com"><img src="https://www.google.com/s2/favicons?domain=gemini.google.com&sz=32" onerror="this.style.display='none'"> Gemini</a>
+      <a class="tl" href="https://grok.com"><img src="https://www.google.com/s2/favicons?domain=grok.com&sz=32" onerror="this.style.display='none'"> Grok</a>
     </div>
   </div>
 </div>
 
-<!-- СЕТКА -->
-<div class="dashboard">
+<!-- LAYOUT -->
+<div class="layout">
 
   <!-- ЛЕВАЯ КОЛОНКА -->
-  <div class="left-col">
+  <div class="col-left">
 
-    <!-- ПОГОДА -->
-    <div class="card weather-card">
-      <div class="card-label">Погода</div>
-      <div class="w-city-input-wrap">
-        <input class="w-city-input" id="city-input" type="text" placeholder="Город..." autocomplete="off">
-        <button class="w-city-btn" onclick="fetchWeatherByCity()">→</button>
+    <!-- ЧАСЫ -->
+    <div class="clock-card">
+      <div class="clock-time">
+        <span id="hh">00</span><span class="clock-colon">:</span><span id="mm">00</span><span class="clock-colon">:</span><span id="ss">00</span>
       </div>
-      <div id="weather-content"><div class="w-msg">Введи город выше</div></div>
+      <div class="clock-divider"></div>
+      <div class="clock-date" id="clock-date"></div>
+      <div class="clock-greet" id="clock-greet"></div>
     </div>
 
-    <!-- ПЛЕЕР -->
-    <div class="card player-card">
-      <div class="card-label">Spotify</div>
-      <div id="sp-root"></div>
+    <!-- ПОГОДА -->
+    <div class="weather-card">
+      <span class="clabel">Погода</span>
+      <div class="w-search">
+        <input class="w-inp" id="w-city" type="text" placeholder="Город..." autocomplete="off">
+        <button class="w-btn" onclick="wFetchCity()">→</button>
+      </div>
+      <div id="w-content"><div class="w-msg">Введи город выше</div></div>
     </div>
 
   </div>
 
-  <!-- ЧАСЫ -->
-  <div class="clock-block">
-    <div class="clock">
-      <span id="hh">00</span><span class="colon">:</span><span id="mm">00</span><span class="colon">:</span><span id="ss">00</span>
+  <!-- ЦЕНТРАЛЬНАЯ КОЛОНКА — НОВОСТИ -->
+  <div class="col-center">
+    <div class="news-card">
+      <div class="news-header">
+        <div class="news-tab tab-gaming active" data-cat="gaming" onclick="newsSwitchTab('gaming')">
+          <div class="news-tab-dot"></div> Игры
+        </div>
+        <div class="news-tab tab-tech" data-cat="tech" onclick="newsSwitchTab('tech')">
+          <div class="news-tab-dot"></div> Технологии
+        </div>
+        <div class="news-tab tab-cinema" data-cat="cinema" onclick="newsSwitchTab('cinema')">
+          <div class="news-tab-dot"></div> Кино и сериалы
+        </div>
+        <button class="news-refresh" id="news-refresh-btn" onclick="newsRefresh()" title="Обновить">↻</button>
+      </div>
+      <div class="news-body" id="news-body"></div>
     </div>
-    <div class="date-str" id="date-str"></div>
-    <div class="greeting"  id="greeting"></div>
   </div>
 
   <!-- ПРАВАЯ КОЛОНКА -->
-  <div class="right-col">
-    <div class="card cal-card">
-      <div class="card-label">Календарь</div>
-      <div class="cal-header">
+  <div class="col-right">
+
+    <!-- КАЛЕНДАРЬ -->
+    <div class="cal-card">
+      <span class="clabel">Календарь</span>
+      <div class="cal-head">
         <button class="cal-nav" onclick="calMove(-1)">‹</button>
-        <div class="cal-month-label" id="cal-month"></div>
+        <div class="cal-month" id="cal-month"></div>
         <button class="cal-nav" onclick="calMove(1)">›</button>
       </div>
       <div class="cal-grid" id="cal-grid"></div>
     </div>
+
+    <!-- СОБЫТИЯ -->
+    <div class="ev-card">
+      <span class="clabel">Ближайшие события</span>
+      <div class="ev-list" id="ev-list"></div>
+    </div>
+
   </div>
 
 </div>
@@ -346,336 +437,323 @@ body::after {
 <script>
 'use strict';
 
-// ══════════════════════════════════
-// SPOTIFY CONFIG
-// ══════════════════════════════════
-const SP_CLIENT_ID   = '500fc179bb774bca9ad911635fcb4c4b';
-const SP_REDIRECT    = 'https://goshke.github.io/index.html';
-const SP_SCOPES      = 'user-read-playback-state user-modify-playback-state user-read-currently-playing';
-
-// ══════════════════════════════════
+// ═══════════════════════════════════════
 // ЧАСЫ
-// ══════════════════════════════════
-const DAYS         = ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
-const MONTHS       = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
-const MONTHS_SHORT = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
-const pad = n => String(n).padStart(2, '0');
-const fmtMs = ms => { const s = Math.floor(ms/1000); return Math.floor(s/60)+':'+pad(s%60); };
+// ═══════════════════════════════════════
+const DAYS = ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
+const MONS = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+const MONS_S = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const pad = n => String(n).padStart(2,'0');
 
 function tick() {
-  const now = new Date();
-  const h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+  const n = new Date(), h = n.getHours(), m = n.getMinutes(), s = n.getSeconds();
   document.getElementById('hh').textContent = pad(h);
   document.getElementById('mm').textContent = pad(m);
   document.getElementById('ss').textContent = pad(s);
-  document.getElementById('date-str').textContent =
-    DAYS[now.getDay()] + ', ' + now.getDate() + ' ' + MONTHS[now.getMonth()] + ' ' + now.getFullYear();
-  document.getElementById('greeting').textContent =
-    h < 6 ? 'Доброй ночи' : h < 12 ? 'Доброе утро' : h < 18 ? 'Добрый день' : 'Добрый вечер';
+  document.getElementById('clock-date').textContent =
+    DAYS[n.getDay()] + ', ' + n.getDate() + ' ' + MONS[n.getMonth()] + ' ' + n.getFullYear();
+  const g = h<6?'Доброй ночи':h<12?'Доброе утро':h<18?'Добрый день':'Добрый вечер';
+  document.getElementById('clock-greet').innerHTML = g + ', <span class="name">Goshke</span>';
 }
 tick(); setInterval(tick, 1000);
 
-// ══════════════════════════════════
+// ═══════════════════════════════════════
+// СОБЫТИЯ КАЛЕНДАРЯ
+// ═══════════════════════════════════════
+const EVENTS = [
+  { name:'День рождения 🎂',    m:4,  d:12, color:'#e07d4f', type:'birthday', repeat:true },
+  { name:'Новый год 🎄',        m:1,  d:1,  color:'#7b9ef6', type:'holiday',  repeat:true },
+  { name:'23 Февраля 🎖',       m:2,  d:23, color:'#7b9ef6', type:'holiday',  repeat:true },
+  { name:'8 Марта 🌸',          m:3,  d:8,  color:'#c97be8', type:'holiday',  repeat:true },
+  { name:'День победы 🎖',      m:5,  d:9,  color:'#7b9ef6', type:'holiday',  repeat:true },
+  { name:'Steam Весна 🎮',      m:3,  d:13, color:'#4fc3a1', type:'sale',     repeat:true },
+  { name:'Steam Лето 🎮',       m:6,  d:26, color:'#4fc3a1', type:'sale',     repeat:true },
+  { name:'Steam Осень 🎮',      m:11, d:27, color:'#4fc3a1', type:'sale',     repeat:true },
+  { name:'Steam Зима 🎮',       m:12, d:19, color:'#4fc3a1', type:'sale',     repeat:true },
+  { name:'Хэллоуин 🎃',        m:10, d:31, color:'#e07d4f', type:'holiday',  repeat:true },
+  { name:'Рождество 🎁',       m:12, d:25, color:'#7b9ef6', type:'holiday',  repeat:true },
+];
+
+function evForDate(y,m,d) {
+  return EVENTS.filter(e => e.repeat ? e.m===m && e.d===d : e.y===y && e.m===m && e.d===d);
+}
+
+function evUpcoming() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const res = [];
+  for (let i=0; i<=90; i++) {
+    const dt = new Date(today); dt.setDate(today.getDate()+i);
+    evForDate(dt.getFullYear(), dt.getMonth()+1, dt.getDate())
+      .forEach(ev => res.push({ev, dt, days:i}));
+  }
+  return res.slice(0,6);
+}
+
+function renderEvents() {
+  const list = document.getElementById('ev-list');
+  const items = evUpcoming();
+  if (!items.length) { list.innerHTML = '<div style="color:var(--text-3);font-size:12px;text-align:center;padding:20px">Нет событий</div>'; return; }
+  const mns = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+  list.innerHTML = items.map(({ev,dt,days}) => {
+    const ds = dt.getDate()+' '+mns[dt.getMonth()];
+    const cnt = days===0?'Сегодня!':days===1?'Завтра':'через '+days+' д.';
+    const soon = days<=3;
+    return `<div class="ev-row">
+      <div class="ev-color" style="background:${ev.color}"></div>
+      <div class="ev-info">
+        <div class="ev-name">${ev.name}</div>
+        <div class="ev-date">${ds}</div>
+      </div>
+      <div class="ev-countdown ${soon?'soon':'far'}">${cnt}</div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════
 // КАЛЕНДАРЬ
-// ══════════════════════════════════
+// ═══════════════════════════════════════
 let calDate = new Date();
-function renderCalendar() {
+
+function renderCal() {
   const today = new Date();
   const y = calDate.getFullYear(), mo = calDate.getMonth();
-  document.getElementById('cal-month').textContent = MONTHS_SHORT[mo] + ' ' + y;
+  document.getElementById('cal-month').textContent = MONS_S[mo]+' '+y;
   const grid = document.getElementById('cal-grid');
   grid.innerHTML = '';
   ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].forEach(d => {
     const el = document.createElement('div');
-    el.className = 'cal-dow'; el.textContent = d; grid.appendChild(el);
+    el.className='cal-dow'; el.textContent=d; grid.appendChild(el);
   });
-  const firstDow = (new Date(y, mo, 1).getDay() + 6) % 7;
-  for (let i = 0; i < firstDow; i++)
-    grid.appendChild(Object.assign(document.createElement('div'), {className:'cal-day'}));
-  const last = new Date(y, mo+1, 0).getDate();
-  for (let d = 1; d <= last; d++) {
+  const fd = (new Date(y,mo,1).getDay()+6)%7;
+  for (let i=0;i<fd;i++) grid.appendChild(Object.assign(document.createElement('div'),{className:'cal-day'}));
+  const last = new Date(y,mo+1,0).getDate();
+  for (let d=1;d<=last;d++) {
     const el = document.createElement('div');
-    el.className = 'cal-day in-month'; el.textContent = d;
-    const dow = (new Date(y, mo, d).getDay() + 6) % 7;
-    if (dow >= 5) el.classList.add('weekend');
-    if (d === today.getDate() && mo === today.getMonth() && y === today.getFullYear())
-      el.classList.add('today');
+    el.className = 'cal-day in';
+    el.textContent = d;
+    const dow = (new Date(y,mo,d).getDay()+6)%7;
+    if (dow>=5) el.classList.add('wkn');
+    if (d===today.getDate()&&mo===today.getMonth()&&y===today.getFullYear()) el.classList.add('now');
+    const evs = evForDate(y,mo+1,d);
+    if (evs.length) {
+      const dot = document.createElement('div');
+      dot.className='ev-dot'; dot.style.background=evs[0].color; el.appendChild(dot);
+      el.setAttribute('data-ev', evs.map(e=>e.name).join(', '));
+    }
     grid.appendChild(el);
   }
+  renderEvents();
 }
-function calMove(dir) { calDate.setMonth(calDate.getMonth() + dir); renderCalendar(); }
-renderCalendar();
+function calMove(dir) { calDate.setMonth(calDate.getMonth()+dir); renderCal(); }
+renderCal();
 
-// ══════════════════════════════════
+// ═══════════════════════════════════════
 // ПОГОДА
-// ══════════════════════════════════
-const WMO_DESC = {
+// ═══════════════════════════════════════
+const WMO_D = {
   0:'Ясно',1:'Преимущественно ясно',2:'Переменная облачность',3:'Пасмурно',
-  45:'Туман',48:'Туман с изморозью',
-  51:'Лёгкая морось',53:'Морось',55:'Густая морось',
+  45:'Туман',48:'Туман с изморозью',51:'Лёгкая морось',53:'Морось',55:'Густая морось',
   61:'Небольшой дождь',63:'Дождь',65:'Сильный дождь',
   71:'Небольшой снег',73:'Снег',75:'Сильный снег',77:'Снежные зёрна',
   80:'Небольшой ливень',81:'Ливень',82:'Сильный ливень',
-  85:'Снегопад',86:'Сильный снегопад',
-  95:'Гроза',96:'Гроза с градом',99:'Гроза с сильным градом'
+  85:'Снегопад',86:'Сильный снегопад',95:'Гроза',96:'Гроза с градом',99:'Гроза с крупным градом'
 };
-const WMO_ICON = {
+const WMO_I = {
   0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',
   51:'🌦️',53:'🌧️',55:'🌧️',61:'🌦️',63:'🌧️',65:'🌧️',
   71:'🌨️',73:'❄️',75:'❄️',77:'🌨️',
   80:'🌦️',81:'🌧️',82:'⛈️',85:'🌨️',86:'❄️',
   95:'⛈️',96:'⛈️',99:'⛈️'
 };
-const WIND_DIR = ['С','СВ','В','ЮВ','Ю','ЮЗ','З','СЗ'];
-const windDir  = deg => WIND_DIR[Math.round(deg/45) % 8];
+const WDIR = ['С','СВ','В','ЮВ','Ю','ЮЗ','З','СЗ'];
+const wdir = deg => WDIR[Math.round(deg/45)%8];
 
-function renderWeather(data, cityName) {
-  const c = data.current, wc = c.weather_code;
-  document.getElementById('weather-content').innerHTML = `
+function wRender(data, city) {
+  const c=data.current, wc=c.weather_code;
+  document.getElementById('w-content').innerHTML = `
     <div class="w-main">
       <div class="w-temp">${Math.round(c.temperature_2m)}°</div>
-      <div class="w-icon">${WMO_ICON[wc]||'🌡️'}</div>
+      <div class="w-icon">${WMO_I[wc]||'🌡️'}</div>
     </div>
-    <div class="w-desc">${WMO_DESC[wc]||'—'}</div>
-    <div class="w-city-name">${cityName}</div>
+    <div class="w-desc">${WMO_D[wc]||'—'}</div>
+    <div class="w-loc">${city}</div>
     <div>
-      <div class="w-row"><div class="w-row-label">🌡 Ощущается</div><div class="w-row-val">${Math.round(c.apparent_temperature)}°C</div></div>
-      <div class="w-row"><div class="w-row-label">💧 Влажность</div><div class="w-row-val">${c.relative_humidity_2m}%</div></div>
-      <div class="w-row"><div class="w-row-label">💨 Ветер</div><div class="w-row-val">${Math.round(c.wind_speed_10m)} км/ч ${windDir(c.wind_direction_10m)}</div></div>
-      <div class="w-row"><div class="w-row-label">🌧 Осадки</div><div class="w-row-val">${c.precipitation} мм</div></div>
+      <div class="w-row"><div class="w-rl">🌡 Ощущается</div><div class="w-rv">${Math.round(c.apparent_temperature)}°C</div></div>
+      <div class="w-row"><div class="w-rl">💧 Влажность</div><div class="w-rv">${c.relative_humidity_2m}%</div></div>
+      <div class="w-row"><div class="w-rl">💨 Ветер</div><div class="w-rv">${Math.round(c.wind_speed_10m)} км/ч ${wdir(c.wind_direction_10m)}</div></div>
+      <div class="w-row"><div class="w-rl">🌧 Осадки</div><div class="w-rv">${c.precipitation} мм</div></div>
     </div>`;
 }
-async function fetchWeatherByCoords(lat, lon, cityName) {
+async function wFetchCoords(lat,lon,city) {
   try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`
-      + `&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,wind_direction_10m`
-      + `&wind_speed_unit=kmh&timezone=auto`;
-    const data = await (await fetch(url)).json();
-    renderWeather(data, cityName);
-    localStorage.setItem('weather_city', cityName);
-    localStorage.setItem('weather_lat', lat);
-    localStorage.setItem('weather_lon', lon);
-  } catch {
-    document.getElementById('weather-content').innerHTML = '<div class="w-msg">Не удалось загрузить погоду</div>';
-  }
+    const d = await (await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,wind_direction_10m&wind_speed_unit=kmh&timezone=auto`)).json();
+    wRender(d,city);
+    localStorage.setItem('w_city',city); localStorage.setItem('w_lat',lat); localStorage.setItem('w_lon',lon);
+  } catch { document.getElementById('w-content').innerHTML='<div class="w-msg">Ошибка загрузки</div>'; }
 }
-async function fetchWeatherByCity() {
-  const city = document.getElementById('city-input').value.trim();
+async function wFetchCity() {
+  const city = document.getElementById('w-city').value.trim();
   if (!city) return;
-  document.getElementById('weather-content').innerHTML = '<div class="w-msg">Загружаю...</div>';
+  document.getElementById('w-content').innerHTML='<div class="w-msg">Загружаю...</div>';
   try {
     const geo = await (await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=ru`)).json();
-    if (!geo.results?.length) { document.getElementById('weather-content').innerHTML = '<div class="w-msg">Город не найден</div>'; return; }
-    const r = geo.results[0];
-    await fetchWeatherByCoords(r.latitude, r.longitude, r.name);
-  } catch {
-    document.getElementById('weather-content').innerHTML = '<div class="w-msg">Ошибка запроса</div>';
-  }
+    if (!geo.results?.length) { document.getElementById('w-content').innerHTML='<div class="w-msg">Город не найден</div>'; return; }
+    const r=geo.results[0]; await wFetchCoords(r.latitude,r.longitude,r.name);
+  } catch { document.getElementById('w-content').innerHTML='<div class="w-msg">Ошибка запроса</div>'; }
 }
-document.getElementById('city-input').addEventListener('keydown', e => { if (e.key==='Enter') fetchWeatherByCity(); });
-const savedCity = localStorage.getItem('weather_city');
-const savedLat  = localStorage.getItem('weather_lat');
-const savedLon  = localStorage.getItem('weather_lon');
-if (savedCity && savedLat && savedLon) {
-  document.getElementById('city-input').value = savedCity;
-  fetchWeatherByCoords(savedLat, savedLon, savedCity);
-}
+document.getElementById('w-city').addEventListener('keydown',e=>{ if(e.key==='Enter') wFetchCity(); });
+const wc=localStorage.getItem('w_city'),wlat=localStorage.getItem('w_lat'),wlon=localStorage.getItem('w_lon');
+if(wc&&wlat&&wlon){ document.getElementById('w-city').value=wc; wFetchCoords(wlat,wlon,wc); }
 
-// ══════════════════════════════════
-// SPOTIFY PLAYER
-// ══════════════════════════════════
-let spToken = null;
-let spPollTimer = null;
-let spLocalMs = 0;
-let spLocalTimer = null;
-let spDurationMs = 0;
-let spIsPlaying = false;
+// ═══════════════════════════════════════
+// НОВОСТИ — RSS через CORS прокси
+// ═══════════════════════════════════════
+const FEEDS = {
+  gaming: [
+    { url:'https://www.ign.com/rss/articles.xml',     source:'IGN',        cat:'gaming' },
+    { url:'https://feeds.eurogamer.net/egfeed.rss',   source:'Eurogamer',  cat:'gaming' },
+    { url:'https://www.pcgamer.com/rss/',              source:'PC Gamer',   cat:'gaming' },
+    { url:'https://www.gamespot.com/feeds/news/',      source:'GameSpot',   cat:'gaming' },
+  ],
+  tech: [
+    { url:'https://www.theverge.com/rss/index.xml',              source:'The Verge',   cat:'tech' },
+    { url:'http://feeds.arstechnica.com/arstechnica/technology', source:'Ars Technica', cat:'tech' },
+    { url:'https://techcrunch.com/feed/',                        source:'TechCrunch',  cat:'tech' },
+    { url:'https://www.wired.com/feed/rss',                      source:'Wired',       cat:'tech' },
+  ],
+  cinema: [
+    { url:'https://variety.com/feed/',                 source:'Variety',   cat:'cinema' },
+    { url:'https://www.hollywoodreporter.com/feed/',   source:'THR',       cat:'cinema' },
+    { url:'https://collider.com/feed/',                source:'Collider',  cat:'cinema' },
+  ],
+};
 
-// Получить токен из URL hash (после редиректа)
-function spGetTokenFromHash() {
-  const hash = window.location.hash.substring(1);
-  const params = new URLSearchParams(hash);
-  const token = params.get('access_token');
-  const expiresIn = params.get('expires_in');
-  if (token) {
-    const expiresAt = Date.now() + parseInt(expiresIn) * 1000;
-    localStorage.setItem('sp_token', token);
-    localStorage.setItem('sp_expires', expiresAt);
-    // Убрать хэш из URL
-    history.replaceState(null, '', window.location.pathname);
-    return token;
+const PROXIES = [
+  'https://api.allorigins.win/raw?url=',
+  'https://corsproxy.io/?url=',
+];
+
+const newsCache = {};
+let curTab = 'gaming';
+
+async function fetchRSS(url) {
+  for (const proxy of PROXIES) {
+    try {
+      const res = await fetch(proxy + encodeURIComponent(url), { signal: AbortSignal.timeout(8000) });
+      if (res.ok) return await res.text();
+    } catch {}
   }
   return null;
 }
 
-function spGetStoredToken() {
-  const token   = localStorage.getItem('sp_token');
-  const expires = localStorage.getItem('sp_expires');
-  if (token && expires && Date.now() < parseInt(expires) - 30000) return token;
-  return null;
+function parseRSS(xml) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(xml, 'text/xml');
+  const items = [...doc.querySelectorAll('item')];
+  return items.slice(0,8).map(item => {
+    const get = tag => item.querySelector(tag)?.textContent?.trim() || '';
+    const getAttr = (tag,attr) => item.querySelector(tag)?.getAttribute(attr) || '';
+    // Картинка — пробуем разные места
+    let img = getAttr('enclosure','url') || getAttr('media\\:content,media:content','url') ||
+      getAttr('media\\:thumbnail,media:thumbnail','url') || '';
+    if (!img) {
+      const desc = get('description');
+      const m = desc.match(/<img[^>]+src=["']([^"']+)["']/i);
+      if (m) img = m[1];
+    }
+    const rawDate = get('pubDate') || get('published') || get('dc\\:date,dc:date') || '';
+    return {
+      title: get('title').replace(/<[^>]*>/g,''),
+      link:  get('link') || getAttr('link','href'),
+      img,
+      date:  rawDate ? timeAgo(new Date(rawDate)) : '',
+    };
+  });
 }
 
-function spLogin() {
-  const url = 'https://accounts.spotify.com/authorize'
-    + '?client_id=' + SP_CLIENT_ID
-    + '&response_type=token'
-    + '&redirect_uri=' + encodeURIComponent(SP_REDIRECT)
-    + '&scope=' + encodeURIComponent(SP_SCOPES)
-    + '&show_dialog=false';
-  window.location = url;
+function timeAgo(date) {
+  if (isNaN(date)) return '';
+  const diff = Math.floor((Date.now() - date) / 60000);
+  if (diff < 1) return 'только что';
+  if (diff < 60) return diff + ' мин. назад';
+  if (diff < 1440) return Math.floor(diff/60) + ' ч. назад';
+  return Math.floor(diff/1440) + ' д. назад';
 }
 
-function spLogout() {
-  localStorage.removeItem('sp_token');
-  localStorage.removeItem('sp_expires');
-  spToken = null;
-  clearInterval(spPollTimer);
-  clearInterval(spLocalTimer);
-  spRenderLogin();
+function newsShowSkeleton() {
+  const body = document.getElementById('news-body');
+  body.innerHTML = Array(6).fill(0).map(() => `
+    <div class="news-skeleton">
+      <div class="skel skel-img"></div>
+      <div class="skel-lines">
+        <div class="skel skel-line" style="width:55%"></div>
+        <div class="skel skel-line" style="width:90%"></div>
+        <div class="skel skel-line" style="width:75%"></div>
+        <div class="skel skel-line" style="width:40%"></div>
+      </div>
+    </div>`).join('');
 }
 
-async function spFetch(endpoint, method = 'GET', body = null) {
-  const opts = { method, headers: { 'Authorization': 'Bearer ' + spToken } };
-  if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
-  const res = await fetch('https://api.spotify.com/v1' + endpoint, opts);
-  if (res.status === 401) { spLogout(); return null; }
-  if (res.status === 204 || res.status === 202) return null;
-  if (!res.ok) return null;
-  return res.json().catch(() => null);
+function newsRender(articles, cat) {
+  const body = document.getElementById('news-body');
+  if (!articles.length) {
+    body.innerHTML = `<div class="news-empty"><div class="news-empty-icon">📡</div><div class="news-empty-text">Не удалось загрузить новости</div></div>`;
+    return;
+  }
+  const emoji = cat==='gaming'?'🎮':cat==='tech'?'⚡':'🎬';
+  body.innerHTML = articles.map(a => `
+    <a class="news-item" href="${a.link}" target="_blank" rel="noopener">
+      ${a.img
+        ? `<img class="news-img" src="${a.img}" alt="" loading="lazy" onerror="this.style.display='none'">`
+        : `<div class="news-img-placeholder">${emoji}</div>`}
+      <div class="news-content">
+        <div class="news-source ${cat}">${a.source}</div>
+        <div class="news-title">${a.title}</div>
+        <div class="news-meta">${a.date}</div>
+      </div>
+    </a>`).join('');
 }
 
-// Рендер — кнопка входа
-function spRenderLogin() {
-  document.getElementById('sp-root').innerHTML = `
-    <button class="sp-login-btn" onclick="spLogin()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="#1db954">
-        <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424a.623.623 0 01-.857.207c-2.348-1.435-5.304-1.76-8.785-.964a.623.623 0 11-.277-1.215c3.809-.87 7.077-.496 9.712 1.115a.623.623 0 01.207.857zm1.223-2.722a.78.78 0 01-1.072.257c-2.687-1.652-6.785-2.131-9.965-1.166a.78.78 0 01-.973-.519.781.781 0 01.52-.973c3.632-1.102 8.147-.568 11.233 1.329a.78.78 0 01.257 1.072zm.105-2.835C14.692 8.95 9.375 8.775 6.297 9.71a.937.937 0 11-.543-1.794c3.532-1.07 9.404-.862 13.115 1.332a.937.937 0 01-.955 1.619z"/>
-      </svg>
-      Войти через Spotify
-    </button>
-    <div class="sp-status" style="margin-top:10px">Нажми чтобы подключить</div>`;
+async function newsLoad(cat, force=false) {
+  if (!force && newsCache[cat]) { newsRender(newsCache[cat], cat); return; }
+  newsShowSkeleton();
+  const btn = document.getElementById('news-refresh-btn');
+  btn.classList.add('spinning');
+
+  const all = [];
+  await Promise.allSettled(FEEDS[cat].map(async feed => {
+    try {
+      const xml = await fetchRSS(feed.url);
+      if (!xml) return;
+      const items = parseRSS(xml);
+      items.forEach(i => { i.source = feed.source; all.push(i); });
+    } catch {}
+  }));
+
+  // Сортировать по свежести (items у которых есть date — выше)
+  all.sort((a,b) => {
+    const ta = a.date.includes('мин')?0:a.date.includes('ч.')?1:2;
+    const tb = b.date.includes('мин')?0:b.date.includes('ч.')?1:2;
+    return ta-tb;
+  });
+
+  newsCache[cat] = all.slice(0,20);
+  btn.classList.remove('spinning');
+  newsRender(newsCache[cat], cat);
 }
 
-// Рендер — нет активного устройства
-function spRenderIdle() {
-  document.getElementById('sp-root').innerHTML = `
-    <div class="sp-cover-placeholder">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="white">
-        <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
-      </svg>
-    </div>
-    <div class="sp-track" style="margin-top:10px">
-      <div class="sp-title" style="color:var(--muted)">Ничего не играет</div>
-      <div class="sp-artist">Открой Spotify и запусти трек</div>
-    </div>
-    <div class="sp-status live" style="cursor:pointer" onclick="spLogout()">× Выйти</div>`;
+function newsSwitchTab(cat) {
+  curTab = cat;
+  document.querySelectorAll('.news-tab').forEach(t => t.classList.toggle('active', t.dataset.cat===cat));
+  newsLoad(cat);
 }
 
-// Рендер — активный трек
-function spRenderTrack(track, isPlaying, progressMs, durationMs) {
-  const coverUrl  = track.album?.images?.[0]?.url || '';
-  const title     = track.name || '—';
-  const artist    = track.artists?.map(a => a.name).join(', ') || '—';
-  const pct       = durationMs ? ((progressMs / durationMs) * 100).toFixed(2) : 0;
-  const playIcon  = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
-  const pauseIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+function newsRefresh() { delete newsCache[curTab]; newsLoad(curTab, true); }
 
-  document.getElementById('sp-root').innerHTML = `
-    <div class="sp-cover-wrap">
-      ${coverUrl
-        ? `<img class="sp-cover" id="sp-cover-img" src="${coverUrl}" alt="cover">`
-        : `<div class="sp-cover-placeholder"><svg width="40" height="40" viewBox="0 0 24 24" fill="white" opacity="0.15"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg></div>`}
-    </div>
-    <div class="sp-track">
-      <div class="sp-title" title="${title}">${title}</div>
-      <div class="sp-artist">${artist}</div>
-    </div>
-    <div class="sp-progress" onclick="spSeek(event)">
-      <div class="sp-bar"><div class="sp-fill" id="sp-fill" style="width:${pct}%"></div></div>
-      <div class="sp-time"><span id="sp-cur">${fmtMs(progressMs)}</span><span>${fmtMs(durationMs)}</span></div>
-    </div>
-    <div class="sp-controls">
-      <button class="sp-btn" onclick="spPrev()" title="Назад">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
-      </button>
-      <button class="sp-btn play" id="sp-playbtn" onclick="spToggle()">
-        ${isPlaying ? pauseIcon : playIcon}
-      </button>
-      <button class="sp-btn" onclick="spNext()" title="Вперёд">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zM6 18l8.5-6L6 6v12z"/></svg>
-      </button>
-    </div>
-    <div class="sp-status live" id="sp-status">● Играет</div>`;
+// Автообновление каждые 10 минут
+setInterval(() => { delete newsCache[curTab]; newsLoad(curTab, true); }, 10*60*1000);
 
-  if (!isPlaying) document.getElementById('sp-status').textContent = '— Пауза';
-}
-
-// Локальный таймер прогресса (между poll-запросами)
-function spStartLocalTimer() {
-  clearInterval(spLocalTimer);
-  if (!spIsPlaying) return;
-  spLocalTimer = setInterval(() => {
-    spLocalMs = Math.min(spLocalMs + 1000, spDurationMs);
-    const pct = spDurationMs ? (spLocalMs / spDurationMs * 100).toFixed(2) : 0;
-    const fill = document.getElementById('sp-fill');
-    const cur  = document.getElementById('sp-cur');
-    if (fill) fill.style.width = pct + '%';
-    if (cur)  cur.textContent  = fmtMs(spLocalMs);
-  }, 1000);
-}
-
-// Получить текущий трек
-async function spPoll() {
-  const data = await spFetch('/me/player/currently-playing');
-  if (!data || !data.item) { spRenderIdle(); clearInterval(spLocalTimer); return; }
-
-  spLocalMs    = data.progress_ms;
-  spDurationMs = data.item.duration_ms;
-  spIsPlaying  = data.is_playing;
-
-  spRenderTrack(data.item, data.is_playing, data.progress_ms, data.item.duration_ms);
-  spStartLocalTimer();
-}
-
-// Управление
-async function spToggle() {
-  spIsPlaying = !spIsPlaying;
-  await spFetch('/me/player/' + (spIsPlaying ? 'play' : 'pause'), 'PUT');
-  const btn = document.getElementById('sp-playbtn');
-  const st  = document.getElementById('sp-status');
-  if (btn) btn.innerHTML = spIsPlaying
-    ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`
-    : `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
-  if (st) st.textContent = spIsPlaying ? '● Играет' : '— Пауза';
-  if (spIsPlaying) spStartLocalTimer(); else clearInterval(spLocalTimer);
-}
-async function spNext() { await spFetch('/me/player/next', 'POST'); setTimeout(spPoll, 500); }
-async function spPrev() { await spFetch('/me/player/previous', 'POST'); setTimeout(spPoll, 500); }
-async function spSeek(e) {
-  const bar   = e.currentTarget;
-  const rect  = bar.getBoundingClientRect();
-  const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-  const posMs = Math.round(ratio * spDurationMs);
-  spLocalMs   = posMs;
-  await spFetch(`/me/player/seek?position_ms=${posMs}`, 'PUT');
-  const fill = document.getElementById('sp-fill');
-  const cur  = document.getElementById('sp-cur');
-  if (fill) fill.style.width = (ratio * 100).toFixed(2) + '%';
-  if (cur)  cur.textContent  = fmtMs(posMs);
-}
-
-// Инициализация
-function spInit() {
-  const tokenFromHash = spGetTokenFromHash();
-  spToken = tokenFromHash || spGetStoredToken();
-
-  if (!spToken) { spRenderLogin(); return; }
-
-  spPoll();
-  spPollTimer = setInterval(spPoll, 5000);
-}
-
-spInit();
+newsLoad('gaming');
 </script>
 </body>
 </html>
