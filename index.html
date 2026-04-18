@@ -482,7 +482,7 @@ if (savedCity && savedLat && savedLon) {
 }
 
 // ══════════════════════════════════
-// SPOTIFY PLAYER
+// SPOTIFY PLAYER (PKCE Flow)
 // ══════════════════════════════════
 let spToken = null;
 let spPollTimer = null;
@@ -491,54 +491,146 @@ let spLocalTimer = null;
 let spDurationMs = 0;
 let spIsPlaying = false;
 
-// Получить токен из URL hash (после редиректа)
-function spGetTokenFromHash() {
-  const hash = window.location.hash.substring(1);
-  const params = new URLSearchParams(hash);
-  const token = params.get('access_token');
-  const expiresIn = params.get('expires_in');
-  if (token) {
-    const expiresAt = Date.now() + parseInt(expiresIn) * 1000;
-    localStorage.setItem('sp_token', token);
-    localStorage.setItem('sp_expires', expiresAt);
-    // Убрать хэш из URL
-    history.replaceState(null, '', window.location.pathname);
-    return token;
+// PKCE Хелперы
+const generateRandomString = (length) => {
+  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const values = crypto.getRandomValues(new Uint8Array(length));
+  return values.reduce((acc, x) => acc + possible[x % possible.length], "");
+}
+const sha256 = async (plain) => {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(plain);
+  return window.crypto.subtle.digest('SHA-256', data);
+}
+const base64encode = (input) => {
+  return btoa(String.fromCharCode(...new Uint8Array(input)))
+    .replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+}
+
+// Вход (редирект на Spotify)
+async function spLogin() {
+  const codeVerifier  = generateRandomString(64);
+  const hashed = await sha256(codeVerifier);
+  const codeChallenge = base64encode(hashed);
+
+  window.localStorage.setItem('sp_code_verifier', codeVerifier);
+
+  const params = new URLSearchParams({
+    client_id: SP_CLIENT_ID,
+    response_type: 'code',
+    redirect_uri: SP_REDIRECT,
+    scope: SP_SCOPES,
+    code_challenge_method: 'S256',
+    code_challenge: codeChallenge
+  });
+
+  window.location = 'https://accounts.spotify.com/authorize?' + params.toString();
+}
+
+// Получение токена из кода (после редиректа обратно)
+async function spGetTokenFromCode() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const code = urlParams.get('code');
+  if (!code) return null;
+
+  const codeVerifier = localStorage.getItem('sp_code_verifier');
+  const payload = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_id: SP_CLIENT_ID,
+      grant_type: 'authorization_code',
+      code: code,
+      redirect_uri: SP_REDIRECT,
+      code_verifier: codeVerifier,
+    }),
+  }
+
+  try {
+    const res = await fetch('https://accounts.spotify.com/api/token', payload);
+    const response = await res.json();
+
+    if (response.access_token) {
+      const expiresAt = Date.now() + parseInt(response.expires_in) * 1000;
+      localStorage.setItem('sp_token', response.access_token);
+      localStorage.setItem('sp_expires', expiresAt);
+      localStorage.setItem('sp_refresh_token', response.refresh_token);
+      
+      // Очищаем адресную строку от ?code=...
+      const url = new URL(window.location.href);
+      url.search = "";
+      history.replaceState(null, '', url.toString());
+
+      return response.access_token;
+    }
+  } catch(e) { console.error('Token error:', e); }
+  return null;
+}
+
+// Обновление протухшего токена
+async function spRefreshToken() {
+  const refreshToken = localStorage.getItem('sp_refresh_token');
+  if(!refreshToken) return null;
+  
+  const payload = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_id: SP_CLIENT_ID,
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken
+    }),
+  }
+  try {
+    const res = await fetch('https://accounts.spotify.com/api/token', payload);
+    const response = await res.json();
+    if(response.access_token) {
+      const expiresAt = Date.now() + parseInt(response.expires_in) * 1000;
+      localStorage.setItem('sp_token', response.access_token);
+      localStorage.setItem('sp_expires', expiresAt);
+      if(response.refresh_token) localStorage.setItem('sp_refresh_token', response.refresh_token);
+      return response.access_token;
+    }
+  } catch(e) {}
+  return null;
+}
+
+// Получение сохраненного токена
+async function spGetStoredToken() {
+  const token = localStorage.getItem('sp_token');
+  const expires = localStorage.getItem('sp_expires');
+  if (token && expires) {
+    if (Date.now() < parseInt(expires) - 30000) return token; // Еще живой
+    return await spRefreshToken(); // Протух, обновляем
   }
   return null;
-}
-
-function spGetStoredToken() {
-  const token   = localStorage.getItem('sp_token');
-  const expires = localStorage.getItem('sp_expires');
-  if (token && expires && Date.now() < parseInt(expires) - 30000) return token;
-  return null;
-}
-
-function spLogin() {
-  const url = 'https://accounts.spotify.com/authorize'
-    + '?client_id=' + SP_CLIENT_ID
-    + '&response_type=token'
-    + '&redirect_uri=' + encodeURIComponent(SP_REDIRECT)
-    + '&scope=' + encodeURIComponent(SP_SCOPES)
-    + '&show_dialog=false';
-  window.location = url;
 }
 
 function spLogout() {
   localStorage.removeItem('sp_token');
   localStorage.removeItem('sp_expires');
+  localStorage.removeItem('sp_refresh_token');
   spToken = null;
   clearInterval(spPollTimer);
   clearInterval(spLocalTimer);
   spRenderLogin();
 }
 
+// Запросы к API Spotify
 async function spFetch(endpoint, method = 'GET', body = null) {
   const opts = { method, headers: { 'Authorization': 'Bearer ' + spToken } };
   if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
-  const res = await fetch('https://api.spotify.com/v1' + endpoint, opts);
-  if (res.status === 401) { spLogout(); return null; }
+  let res = await fetch('https://api.spotify.com/v1' + endpoint, opts);
+  
+  if (res.status === 401) { 
+    spToken = await spRefreshToken();
+    if (spToken) {
+       opts.headers['Authorization'] = 'Bearer ' + spToken;
+       res = await fetch('https://api.spotify.com/v1' + endpoint, opts);
+    } else {
+       spLogout(); return null; 
+    }
+  }
   if (res.status === 204 || res.status === 202) return null;
   if (!res.ok) return null;
   return res.json().catch(() => null);
@@ -610,7 +702,7 @@ function spRenderTrack(track, isPlaying, progressMs, durationMs) {
   if (!isPlaying) document.getElementById('sp-status').textContent = '— Пауза';
 }
 
-// Локальный таймер прогресса (между poll-запросами)
+// Локальный таймер прогресса
 function spStartLocalTimer() {
   clearInterval(spLocalTimer);
   if (!spIsPlaying) return;
@@ -665,9 +757,8 @@ async function spSeek(e) {
 }
 
 // Инициализация
-function spInit() {
-  const tokenFromHash = spGetTokenFromHash();
-  spToken = tokenFromHash || spGetStoredToken();
+async function spInit() {
+  spToken = await spGetTokenFromCode() || await spGetStoredToken();
 
   if (!spToken) { spRenderLogin(); return; }
 
